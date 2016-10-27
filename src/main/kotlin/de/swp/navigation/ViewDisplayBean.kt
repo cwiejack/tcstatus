@@ -1,4 +1,4 @@
-package de.swp
+package de.swp.navigation
 
 import com.vaadin.navigator.View
 import com.vaadin.navigator.ViewDisplay

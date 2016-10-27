@@ -1,4 +1,4 @@
-package de.swp
+package de.swp.ui
 
 import com.vaadin.annotations.Theme
 import com.vaadin.navigator.ViewDisplay
@@ -8,6 +8,7 @@ import com.vaadin.spring.annotation.SpringUI
 import com.vaadin.ui.Component
 import com.vaadin.ui.UI
 import com.vaadin.ui.themes.ValoTheme
+import de.swp.navigation.NavigationManagerBean
 import org.springframework.beans.factory.annotation.Autowired
 
 @SpringUI
