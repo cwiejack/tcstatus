@@ -12,7 +12,7 @@ import de.swp.navigation.NavigationManagerBean
 import org.springframework.beans.factory.annotation.Autowired
 
 @SpringUI
-@Theme("valo")
+@Theme("tcstatus")
 class TCStatusUI : UI() {
 
     @Autowired

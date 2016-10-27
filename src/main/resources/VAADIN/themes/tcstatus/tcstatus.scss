@@ -1,0 +1,16 @@
+@import "../valo/valo.scss";
+
+@mixin basic {
+  @include valo;
+}
+
+@mixin admin {
+  @include valo;
+
+  #adminView #serverDataForm {
+    background-color: lightblue;
+  }
+}
+
+@include basic;
+@include admin;

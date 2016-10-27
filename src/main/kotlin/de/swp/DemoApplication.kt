@@ -4,14 +4,31 @@ import de.swp.model.TCServerData
 import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.Option
 import org.apache.commons.cli.Options
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.annotation.Bean
 import java.net.URL
+import java.nio.file.Files
+import java.nio.file.Paths
+import javax.annotation.PostConstruct
+import javax.servlet.ServletContext
 
 @SpringBootApplication
 open class DemoApplication {
+
+    lateinit var servletContext: ServletContext @Autowired set
+
+    @PostConstruct
+    fun init() {
+        val root = servletContext.getRealPath("/");
+        if (root != null && Files.isDirectory(Paths.get(root))) {
+//            log(Level.DEBUG,"apply workaround for Vaadin 18463")
+            // workaround for https://dev.vaadin.com/ticket/18463
+            Files.createDirectories(Paths.get(servletContext.getRealPath("/VAADIN/themes/tcstatus")));
+        }
+    }
 
     @Bean
     open fun commandLineRunner(tcServerData: TCServerData): CommandLineRunner {
