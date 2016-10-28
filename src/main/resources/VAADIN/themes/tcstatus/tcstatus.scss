@@ -10,6 +10,25 @@
   #adminView #serverDataForm {
     background-color: lightblue;
   }
+
+  #adminView #projectcontent {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-around;
+  }
+
+  #adminView #projectcontent .v-checkbox {
+    //padding-top: 5px;
+    background: lightblue;
+    margin-top: 5px;
+    font-size: 0.8em;
+  }
+
+  #adminView #projectcontent .v-checkbox label {
+    width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 @include basic;

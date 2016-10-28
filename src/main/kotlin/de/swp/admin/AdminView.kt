@@ -9,22 +9,25 @@ import com.vaadin.navigator.ViewChangeListener
 import com.vaadin.server.FontAwesome
 import com.vaadin.server.Responsive
 import com.vaadin.spring.annotation.SpringView
-import com.vaadin.ui.Field
-import com.vaadin.ui.FormLayout
-import com.vaadin.ui.HorizontalLayout
-import com.vaadin.ui.TextField
+import com.vaadin.ui.*
+import com.vaadin.ui.themes.ValoTheme
 import de.swp.model.TCServerData
+import de.swp.services.TCService
 import java.net.MalformedURLException
 import java.net.URL
 import java.util.*
 
 @SpringView(name = "")
-class AdminView constructor(val tcServerData: TCServerData) : HorizontalLayout(), View {
+class AdminView constructor(val tcServerData: TCServerData, val tcService: TCService) : VerticalLayout(), View {
+
+    val accordion : Accordion
 
     init {
         id = "adminView"
+        accordion = Accordion()
         setSizeFull()
         Responsive.makeResponsive(this)
+
     }
 
     override fun enter(event: ViewChangeListener.ViewChangeEvent?) {
@@ -41,7 +44,7 @@ class AdminView constructor(val tcServerData: TCServerData) : HorizontalLayout()
             nullRepresentation = ""
             setSizeFull()
         }
-        binder.bind(textField,"serverUrl")
+        binder.bind(textField, "serverUrl")
 
         val userNameField = binder.buildAndBind("Benutzer", "userName") as TextField
         userNameField.apply {
@@ -60,14 +63,50 @@ class AdminView constructor(val tcServerData: TCServerData) : HorizontalLayout()
         layout.addComponent(textField)
         layout.addComponent(userNameField)
         layout.addComponent(passwortField)
+        val updateButton = Button("Aktualisieren", Button.ClickListener {
+            binder.commit()
+            showAllBuildConfigurationsIfConfigured()
+        }).apply {
+            styleName = ValoTheme.BUTTON_PRIMARY
+        }
 
-        addComponent(layout)
+        layout.addComponents(updateButton)
+
+        addComponents(layout,accordion)
+        setExpandRatio(accordion, 1f)
+
+        showAllBuildConfigurationsIfConfigured()
+
+    }
+
+    private fun showAllBuildConfigurationsIfConfigured() {
+        when (tcServerData.isComplete()) {
+            true -> showAllBuildConfigurations()
+            else -> Notification.show("Bitte aktualisieren Sie die Zugangsdaten", Notification.Type.WARNING_MESSAGE)
+        }
+    }
+
+    private fun showAllBuildConfigurations() {
+        accordion.removeAllComponents()
+
+        val configurations = tcService.retreiveAllConfigurations()
+
+        configurations.forEach { config ->
+            val contentLayout = CssLayout().apply {
+                id = "projectcontent"
+                config.buildConfigurations.forEach { buildConfig ->
+                    addComponent(CheckBox(buildConfig.name))
+                }
+            }
+            accordion.addTab(contentLayout, config.project.name, FontAwesome.FOLDER)
+        }
+
     }
 
     internal class CustomFieldFactory constructor(val delegate: FieldGroupFieldFactory) : FieldGroupFieldFactory {
 
         override fun <T : Field<*>?> createField(dataType: Class<*>?, fieldType: Class<T>?): T {
-            return delegate.createField(dataType,fieldType)
+            return delegate.createField(dataType, fieldType)
         }
 
     }
@@ -75,13 +114,13 @@ class AdminView constructor(val tcServerData: TCServerData) : HorizontalLayout()
     internal class URLConverter : Converter<String, URL> {
         override fun getModelType(): Class<URL> = URL::class.java
 
-        override fun getPresentationType(): Class<String>  = String::class.java
+        override fun getPresentationType(): Class<String> = String::class.java
 
-        override fun convertToPresentation(value: URL?, targetType: Class<out String>?, locale: Locale?): String  = value.toString()
+        override fun convertToPresentation(value: URL?, targetType: Class<out String>?, locale: Locale?): String = value.toString()
 
-        override fun convertToModel(value: String?, targetType: Class<out URL>?, locale: Locale?): URL =  try {
+        override fun convertToModel(value: String?, targetType: Class<out URL>?, locale: Locale?): URL = try {
             URL(value)
-        } catch (ex : MalformedURLException) {
+        } catch (ex: MalformedURLException) {
             URL("http://toBeDefined")
         }
     }
