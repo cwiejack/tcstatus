@@ -6,9 +6,7 @@ import com.vaadin.data.fieldgroup.FieldGroupFieldFactory
 import com.vaadin.data.util.converter.Converter
 import com.vaadin.navigator.View
 import com.vaadin.navigator.ViewChangeListener
-import com.vaadin.server.ExternalResource
-import com.vaadin.server.FontAwesome
-import com.vaadin.server.Responsive
+import com.vaadin.server.*
 import com.vaadin.spring.annotation.SpringView
 import com.vaadin.ui.*
 import com.vaadin.ui.themes.ValoTheme
@@ -22,9 +20,9 @@ import java.util.*
 @SpringView(name = "")
 class AdminView constructor(val tcServerData: TCServerData, val tcService: TCService) : VerticalLayout(), View {
 
-    val accordion : Accordion
+    val accordion: Accordion
 
-    val  selectedConfigurations = ArrayList<BuildConfiguration>()
+    val selectedConfigurations = ArrayList<BuildConfiguration>()
 
     init {
         id = "adminView"
@@ -86,7 +84,7 @@ class AdminView constructor(val tcServerData: TCServerData, val tcService: TCSer
 
         layout.addComponents(buttonLayout)
 
-        addComponents(layout,accordion)
+        addComponents(layout, accordion)
         setExpandRatio(accordion, 1f)
 
         showAllBuildConfigurationsIfConfigured()
@@ -94,8 +92,44 @@ class AdminView constructor(val tcServerData: TCServerData, val tcService: TCSer
     }
 
     private fun createMonitorLink() {
-        val parameterString = selectedConfigurations.joinToString("/","/","",transform = {buildConfig ->  buildConfig.id.stringId})
+        val parameterString = selectedConfigurations.joinToString("/", "/", "", transform = { buildConfig -> buildConfig.id.stringId })
         val resource = ExternalResource("#!status".plus(parameterString))
+
+        val popupConentLayout = VerticalLayout().apply {
+            val urlField = TextField().apply {
+                setSizeFull()
+                val currentLocation = Page.getCurrent().location
+                value = currentLocation.toString().plus(resource.url)
+
+            }
+
+            val buttonContainer = HorizontalLayout().apply {
+                isSpacing = true
+                setSizeFull()
+                val openInTabButton = Button("Im neuen Tab öffnen").apply {
+                    val opener = BrowserWindowOpener(resource).apply {
+                        features = ""
+                    }
+                    opener.extend(this)
+                    styleName = ValoTheme.BUTTON_SMALL
+                }
+                addComponents(openInTabButton)
+            }
+            isSpacing = true
+            addComponents(urlField, buttonContainer)
+        }
+        val popupWindow = Window("Monitor Url").apply {
+            center()
+            content = popupConentLayout
+            addCloseListener { UI.getCurrent().removeWindow(this) }
+            isVisible = true
+            setWidth(300.0f,Sizeable.Unit.PIXELS)
+        }
+        UI.getCurrent().addWindow(popupWindow)
+
+
+
+
     }
 
     private fun showAllBuildConfigurationsIfConfigured() {
@@ -108,7 +142,7 @@ class AdminView constructor(val tcServerData: TCServerData, val tcService: TCSer
     private fun showAllBuildConfigurations() {
         accordion.removeAllComponents()
 
-        val configurations = tcService.retreiveAllConfigurations()
+        val configurations = tcService.retrieveAllConfigurations()
 
         configurations.forEach { config ->
             val contentLayout = CssLayout().apply {
@@ -117,7 +151,7 @@ class AdminView constructor(val tcServerData: TCServerData, val tcService: TCSer
                     val checkBox = CheckBox(buildConfig.name).apply {
                         addValueChangeListener { event ->
                             val selected = event.property.value as Boolean
-                            when(selected) {
+                            when (selected) {
                                 true -> selectedConfigurations.add(buildConfig)
                                 false -> selectedConfigurations.remove(buildConfig)
                             }
@@ -152,4 +186,6 @@ class AdminView constructor(val tcServerData: TCServerData, val tcService: TCSer
             URL("http://toBeDefined")
         }
     }
+
+
 }
