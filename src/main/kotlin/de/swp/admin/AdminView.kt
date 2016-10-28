@@ -6,6 +6,7 @@ import com.vaadin.data.fieldgroup.FieldGroupFieldFactory
 import com.vaadin.data.util.converter.Converter
 import com.vaadin.navigator.View
 import com.vaadin.navigator.ViewChangeListener
+import com.vaadin.server.ExternalResource
 import com.vaadin.server.FontAwesome
 import com.vaadin.server.Responsive
 import com.vaadin.spring.annotation.SpringView
@@ -13,6 +14,7 @@ import com.vaadin.ui.*
 import com.vaadin.ui.themes.ValoTheme
 import de.swp.model.TCServerData
 import de.swp.services.TCService
+import org.jetbrains.teamcity.rest.BuildConfiguration
 import java.net.MalformedURLException
 import java.net.URL
 import java.util.*
@@ -22,12 +24,13 @@ class AdminView constructor(val tcServerData: TCServerData, val tcService: TCSer
 
     val accordion : Accordion
 
+    val  selectedConfigurations = ArrayList<BuildConfiguration>()
+
     init {
         id = "adminView"
         accordion = Accordion()
         setSizeFull()
         Responsive.makeResponsive(this)
-
     }
 
     override fun enter(event: ViewChangeListener.ViewChangeEvent?) {
@@ -70,13 +73,29 @@ class AdminView constructor(val tcServerData: TCServerData, val tcService: TCSer
             styleName = ValoTheme.BUTTON_PRIMARY
         }
 
-        layout.addComponents(updateButton)
+        val createLink = Button("Erzeuge Monitor Link", Button.ClickListener {
+            createMonitorLink()
+        }).apply {
+            styleName = ValoTheme.BUTTON_FRIENDLY
+        }
+
+        val buttonLayout = HorizontalLayout().apply {
+            isSpacing = true
+            addComponents(updateButton, createLink)
+        }
+
+        layout.addComponents(buttonLayout)
 
         addComponents(layout,accordion)
         setExpandRatio(accordion, 1f)
 
         showAllBuildConfigurationsIfConfigured()
 
+    }
+
+    private fun createMonitorLink() {
+        val parameterString = selectedConfigurations.joinToString("/","/","",transform = {buildConfig ->  buildConfig.id.stringId})
+        val resource = ExternalResource("#!status".plus(parameterString))
     }
 
     private fun showAllBuildConfigurationsIfConfigured() {
@@ -95,7 +114,16 @@ class AdminView constructor(val tcServerData: TCServerData, val tcService: TCSer
             val contentLayout = CssLayout().apply {
                 id = "projectcontent"
                 config.buildConfigurations.forEach { buildConfig ->
-                    addComponent(CheckBox(buildConfig.name))
+                    val checkBox = CheckBox(buildConfig.name).apply {
+                        addValueChangeListener { event ->
+                            val selected = event.property.value as Boolean
+                            when(selected) {
+                                true -> selectedConfigurations.add(buildConfig)
+                                false -> selectedConfigurations.remove(buildConfig)
+                            }
+                        }
+                    }
+                    addComponent(checkBox)
                 }
             }
             accordion.addTab(contentLayout, config.project.name, FontAwesome.FOLDER)
