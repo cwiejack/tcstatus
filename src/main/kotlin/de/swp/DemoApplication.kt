@@ -12,6 +12,8 @@ import org.springframework.context.annotation.Bean
 import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.ScheduledThreadPoolExecutor
 import javax.annotation.PostConstruct
 import javax.servlet.ServletContext
 
@@ -29,6 +31,9 @@ open class DemoApplication {
             Files.createDirectories(Paths.get(servletContext.getRealPath("/VAADIN/themes/tcstatus")));
         }
     }
+
+    @Bean(destroyMethod = "shutdownNow")
+    open fun executorService() : ScheduledExecutorService = ScheduledThreadPoolExecutor(5)
 
     @Bean
     open fun commandLineRunner(tcServerData: TCServerData): CommandLineRunner {

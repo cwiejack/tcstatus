@@ -6,7 +6,7 @@ import org.jetbrains.teamcity.rest.*
 
 data class ProjectBuildConfigurations(val project: Project, val buildConfigurations : List<BuildConfiguration>)
 
-data class BuildConfigurationWithBuild(val buildConfiguration: BuildConfiguration, val build: Build?)
+data class BuildStatus(val buildConfiguration: BuildConfiguration, val latestBuild: Build?)
 
 @SpringComponent
 class TCService constructor(val tcServerData: TCServerData){
@@ -25,11 +25,11 @@ class TCService constructor(val tcServerData: TCServerData){
         return projectBuildConfigurations
     }
 
-    fun retrieveBuildConfigurations(buildConfigIds: List<String>) : List<BuildConfigurationWithBuild> {
+    fun retrieveBuildConfigurations(buildConfigIds: List<String>) : List<BuildStatus> {
         val resultList = buildConfigIds.map { buildConfigId ->
             val buildConfiguration = createTeamcityInstance().buildConfiguration(BuildConfigurationId(buildConfigId))
-            val latestBuild = createTeamcityInstance().builds().fromConfiguration(buildConfiguration.id).latest()
-            BuildConfigurationWithBuild(buildConfiguration, latestBuild)
+            val latestBuild = createTeamcityInstance().builds().fromConfiguration(buildConfiguration.id).withAnyStatus().latest()
+            BuildStatus(buildConfiguration, latestBuild)
         }
         return resultList
     }

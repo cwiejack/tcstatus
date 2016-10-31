@@ -31,5 +31,37 @@
   }
 }
 
+@mixin status {
+  #statusView {
+    background-color: lightblue;
+
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-around;
+  }
+
+  #statusView .buildStatus {
+    width: 800px;
+    height: 250px;
+    line-height: 250px;
+
+    margin: 10px;
+    font-size: 2em;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+  }
+
+  #statusView .buildStatus .success {
+    background-color: lightseagreen;
+  }
+
+  #statusView .buildStatus .failure {
+    background-color: red;
+  }
+}
+
 @include basic;
 @include admin;
+@include status;

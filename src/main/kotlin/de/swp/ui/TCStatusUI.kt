@@ -1,5 +1,6 @@
 package de.swp.ui
 
+import com.vaadin.annotations.Push
 import com.vaadin.annotations.Theme
 import com.vaadin.navigator.ViewDisplay
 import com.vaadin.server.Responsive
@@ -11,6 +12,7 @@ import com.vaadin.ui.themes.ValoTheme
 import de.swp.navigation.NavigationManagerBean
 import org.springframework.beans.factory.annotation.Autowired
 
+@Push
 @SpringUI
 @Theme("tcstatus")
 class TCStatusUI : UI() {
