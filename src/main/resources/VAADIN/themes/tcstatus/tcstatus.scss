@@ -32,8 +32,14 @@
 }
 
 @mixin status {
+  $success-color: #2ec422;
+  $failure-color: #C41E36;
+
+  $box-width: 800px;
+  $box-height: 250px;
+
   #statusView {
-    background-color: lightblue;
+    background-color: #C2CBCE;
 
     display: flex;
     flex-flow: row wrap;
@@ -41,9 +47,9 @@
   }
 
   #statusView .buildStatus {
-    width: 800px;
-    height: 250px;
-    line-height: 250px;
+    width: $box-width;
+    height: $box-height;
+    line-height: $box-height;
 
     margin: 10px;
     font-size: 2em;
@@ -53,12 +59,40 @@
     vertical-align: middle;
   }
 
-  #statusView .buildStatus .success {
-    background-color: lightseagreen;
+  .v-label-success, .v-label-failure {
+    background: $success-color;
+    color: #474747;
+    border: 2px solid black;
+    border-radius: 4px;
+    padding: 7px 19px 7px 37px;
+    font-weight: 400;
+    font-size: 15px;
   }
 
-  #statusView .buildStatus .failure {
-    background-color: red;
+  .v-label-success:before, .v-label-failure:before {
+    font-family: ThemeIcons;
+    content: "\f00c";
+    margin-right: 0.5em;
+    margin-left: -19px;
+    color: white;
+  }
+
+  @keyframes blink {
+    from { background: $failure-color; height: $box-height; width: $box-width}
+    to { background: lighten($failure-color,10%); width: calc($box-width + 50px);}
+  }
+
+  .v-label-failure {
+    animation-name: blink;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    background: $failure-color;
+    color: white;
+  }
+
+  .v-label-failure:before {
+    content: "\f05e";
   }
 }
 

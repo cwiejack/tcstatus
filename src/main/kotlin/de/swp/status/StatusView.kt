@@ -5,6 +5,7 @@ import com.vaadin.navigator.ViewChangeListener
 import com.vaadin.spring.annotation.SpringView
 import com.vaadin.ui.CssLayout
 import com.vaadin.ui.Label
+import com.vaadin.ui.Panel
 import com.vaadin.ui.UI
 import de.swp.services.BuildStatus
 import de.swp.services.TCService
@@ -15,19 +16,22 @@ import javax.annotation.PreDestroy
 
 
 @SpringView(name = StatusView.VIEW_NAME)
-class StatusView constructor(val tcService: TCService, val ui: UI, val executorService: ScheduledExecutorService) : CssLayout(), View {
+class StatusView constructor(val tcService: TCService, val ui: UI, val executorService: ScheduledExecutorService) : Panel(), View {
 
+
+    var backgroundTask: ScheduledFuture<*>? = null
+    var layout = CssLayout()
 
     companion object {
         const val VIEW_NAME = "status"
+
     }
 
     init {
-        id = "statusView"
+        layout.id = "statusView"
+        content = layout
         setSizeFull()
     }
-
-    var backgroundTask: ScheduledFuture<*>? = null
 
 
     override fun enter(event: ViewChangeListener.ViewChangeEvent?) {
@@ -45,18 +49,18 @@ class StatusView constructor(val tcService: TCService, val ui: UI, val executorS
     }
 
     private fun showBuildConfigStatus(buildConfigStatus: List<BuildStatus>) {
-        removeAllComponents()
+        layout.removeAllComponents()
         buildConfigStatus.forEach { buildStatus ->
             val buildStatusUI = Label(buildStatus.buildConfiguration.name).apply {
                 setWidthUndefined()
                 styleName = "buildStatus"
-                when (buildStatus.latestBuild!!.status) {
+                when (buildStatus.latestBuild?.status) {
                     org.jetbrains.teamcity.rest.BuildStatus.SUCCESS -> addStyleName("success")
                     else -> addStyleName("failure")
                 }
             }
 
-            addComponent(buildStatusUI)
+            layout.addComponent(buildStatusUI)
         }
     }
 
