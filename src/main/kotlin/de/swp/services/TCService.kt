@@ -37,5 +37,7 @@ class TCService constructor(val tcServerData: TCServerData){
 
     private fun createTeamcityInstance() = TeamCityInstance.httpAuth(tcServerData.serverUrl.toString(), tcServerData.userName!!, tcServerData.password!!)
 
+    fun playSound(): Boolean = tcServerData.playSound
+
 
 }

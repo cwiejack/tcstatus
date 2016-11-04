@@ -61,9 +61,15 @@ class AdminView constructor(val tcServerData: TCServerData, val tcService: TCSer
             setSizeFull()
         }
 
+        val playSound = binder.buildAndBind("Sound", "playSound").apply {
+            icon = FontAwesome.MUSIC
+            setSizeFull()
+        }
+
         layout.addComponent(textField)
         layout.addComponent(userNameField)
         layout.addComponent(passwortField)
+        layout.addComponents(playSound)
         val updateButton = Button("Aktualisieren", Button.ClickListener {
             binder.commit()
             showAllBuildConfigurationsIfConfigured()

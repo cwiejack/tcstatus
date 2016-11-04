@@ -4,7 +4,7 @@ import com.vaadin.spring.annotation.SpringComponent
 import java.net.URL
 
 @SpringComponent
-data class TCServerData(var serverUrl: URL?, var userName : String?, var password : String?) {
+data class TCServerData(var serverUrl: URL?, var userName : String?, var password : String?, var playSound : Boolean = true) {
 
     //needed to be used as Spring Component
     constructor() : this(null, null, null) {

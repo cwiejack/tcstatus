@@ -134,6 +134,10 @@
   .v-label-failure:before {
     content: "\f05e";
   }
+
+  #alertAudio {
+    visibility: hidden;
+  }
 }
 
 @include basic;
