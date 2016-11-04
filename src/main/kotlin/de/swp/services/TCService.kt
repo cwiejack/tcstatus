@@ -26,7 +26,7 @@ class TCService constructor(val tcServerData: TCServerData){
     }
 
     fun retrieveBuildConfigurations(buildConfigIds: List<String>) : List<BuildStatus> {
-        val resultList = buildConfigIds.map { buildConfigId ->
+        val resultList = buildConfigIds.sortedBy { it }.map { buildConfigId ->
             val buildConfiguration = createTeamcityInstance().buildConfiguration(BuildConfigurationId(buildConfigId))
             val latestBuild = createTeamcityInstance().builds().fromConfiguration(buildConfiguration.id).withAnyStatus().latest()
             BuildStatus(buildConfiguration, latestBuild)

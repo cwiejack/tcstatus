@@ -32,24 +32,58 @@
 }
 
 @mixin status {
+  $v-app-background-color : #C2CBCE;
+
+  $break-small: 320px;
+  $break-single-column: 800px;
+
   $success-color: #2ec422;
   $failure-color: #C41E36;
 
-  $box-width: 800px;
-  $box-height: 250px;
+  $status-label-width: 750px;
+  $status-label-height: 250px;
+  $status-container-width : 800px;
+  $status-container-height: 250px;
 
   #statusView {
-    background-color: #C2CBCE;
-
     display: flex;
     flex-flow: row wrap;
     justify-content: space-around;
   }
 
+  #statusView .buildStatusContainer {
+    width: $status-container-width;
+    height: $status-container-height;
+
+    display: flex;
+    justify-content: center;
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+
+  @include width-range($min: 0, $max: $break-single-column) {
+    #statusView .buildStatusContainer {
+      width: 90%;
+    }
+
+    #statusView .v-slot-buildStatus {
+      width: 100%;
+    }
+
+    #statusView .buildStatus {
+      width: 100%;
+    }
+
+    .v-label-failure {
+      animation-name: blink;
+    }
+
+  }
+
   #statusView .buildStatus {
-    width: $box-width;
-    height: $box-height;
-    line-height: $box-height;
+    width: $status-label-width;
+    height: $status-label-height;
+    line-height: $status-label-height;
 
     margin: 10px;
     font-size: 2em;
@@ -77,13 +111,18 @@
     color: white;
   }
 
+  @keyframes blink-and-pump {
+    from { background: $failure-color; height: $status-label-height; width: $status-label-width}
+    to { background: lighten($failure-color,10%); width: calc($status-label-width + 50px);}
+  }
+
   @keyframes blink {
-    from { background: $failure-color; height: $box-height; width: $box-width}
-    to { background: lighten($failure-color,10%); width: calc($box-width + 50px);}
+    from { background: $failure-color;}
+    to { background: lighten($failure-color,10%);}
   }
 
   .v-label-failure {
-    animation-name: blink;
+    animation-name: blink-and-pump;
     animation-duration: 2s;
     animation-iteration-count: infinite;
     animation-direction: alternate;

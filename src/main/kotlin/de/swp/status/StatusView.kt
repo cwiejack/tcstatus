@@ -2,11 +2,9 @@ package de.swp.status
 
 import com.vaadin.navigator.View
 import com.vaadin.navigator.ViewChangeListener
+import com.vaadin.server.Responsive
 import com.vaadin.spring.annotation.SpringView
-import com.vaadin.ui.CssLayout
-import com.vaadin.ui.Label
-import com.vaadin.ui.Panel
-import com.vaadin.ui.UI
+import com.vaadin.ui.*
 import de.swp.services.BuildStatus
 import de.swp.services.TCService
 import java.util.concurrent.ScheduledExecutorService
@@ -28,6 +26,7 @@ class StatusView constructor(val tcService: TCService, val ui: UI, val executorS
     }
 
     init {
+        Responsive.makeResponsive(this, layout)
         layout.id = "statusView"
         content = layout
         setSizeFull()
@@ -60,7 +59,12 @@ class StatusView constructor(val tcService: TCService, val ui: UI, val executorS
                 }
             }
 
-            layout.addComponent(buildStatusUI)
+            val buildStatusContainer = VerticalLayout(buildStatusUI).apply {
+                setSizeUndefined()
+                styleName = "buildStatusContainer"
+            }
+
+            layout.addComponent(buildStatusContainer)
         }
     }
 
