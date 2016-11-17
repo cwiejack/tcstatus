@@ -7,6 +7,9 @@ import de.swp.model.MonitorObject
 interface MonitorDataService {
 
     fun isResponsibleFor(monitorId: MonitorId): Boolean
-    fun  retrieve(monitorIds: List<MonitorId>): List<MonitorObject>
+    fun retrieve(monitorIds: List<MonitorId>): List<MonitorObject>
+
+    fun getSystemId() : String
+    fun getName() : String
 
 }

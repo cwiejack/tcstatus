@@ -9,6 +9,8 @@ import java.util.*
 @SpringComponent
 class MonitorService constructor(val monitorDataServices : List<MonitorDataService>) {
 
+    fun allDataServices(): List<MonitorDataService> = monitorDataServices
+
     fun retrieve(monitorIds : List<MonitorId>) : List<MonitorObject> {
         val idMap = monitorIds.asSequence().groupBy { it.id }
         return idMap.keys.flatMap { key ->

@@ -11,14 +11,14 @@ import com.vaadin.spring.annotation.SpringView
 import com.vaadin.ui.*
 import com.vaadin.ui.themes.ValoTheme
 import de.swp.model.TCServerData
-import de.swp.services.TCService
+import de.swp.services.TCDataService
 import org.jetbrains.teamcity.rest.BuildConfiguration
 import java.net.MalformedURLException
 import java.net.URL
 import java.util.*
 
 @SpringView(name = "")
-class AdminView constructor(val tcServerData: TCServerData, val tcService: TCService) : VerticalLayout(), View {
+class AdminView constructor(val tcServerData: TCServerData, val tcDataService: TCDataService) : VerticalLayout(), View {
 
     val accordion: Accordion
 
@@ -98,7 +98,8 @@ class AdminView constructor(val tcServerData: TCServerData, val tcService: TCSer
     }
 
     private fun createMonitorLink() {
-        val parameterString = selectedConfigurations.joinToString("/", "/", "", transform = { buildConfig -> buildConfig.id.stringId })
+        val parameterString = selectedConfigurations.joinToString("/", "/", "", transform = { buildConfig -> tcDataService.toMonitorId(buildConfig).asCompleteId() })
+
         val resource = ExternalResource("#!status".plus(parameterString))
 
         val popupConentLayout = VerticalLayout().apply {
@@ -148,7 +149,7 @@ class AdminView constructor(val tcServerData: TCServerData, val tcService: TCSer
     private fun showAllBuildConfigurations() {
         accordion.removeAllComponents()
 
-        val configurations = tcService.retrieveAllConfigurations()
+        val configurations = tcDataService.allAvailableBuildConfigurations()
 
         configurations.forEach { config ->
             val contentLayout = CssLayout().apply {

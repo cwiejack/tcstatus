@@ -6,8 +6,10 @@ import com.vaadin.server.Responsive
 import com.vaadin.server.ThemeResource
 import com.vaadin.spring.annotation.SpringView
 import com.vaadin.ui.*
-import de.swp.services.BuildStatus
-import de.swp.services.TCService
+import de.swp.model.MonitorId
+import de.swp.model.MonitorObject
+import de.swp.model.Status
+import de.swp.services.MonitorService
 import java.util.*
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ScheduledFuture
@@ -16,13 +18,14 @@ import javax.annotation.PreDestroy
 
 
 @SpringView(name = StatusView.VIEW_NAME)
-class StatusView constructor(val tcService: TCService, val ui: UI, val executorService: ScheduledExecutorService) : Panel(), View {
+class StatusView constructor(val monitorService: MonitorService, val ui: UI, val executorService: ScheduledExecutorService) : Panel(), View {
 
 
     var backgroundTask: ScheduledFuture<*>? = null
     var statusLayout = CssLayout()
 
-    var previousBuildStatus = ArrayList<BuildStatus>()
+    var previousBuildStatus = ArrayList<MonitorObject>()
+
     val alert : Audio
 
     companion object {
@@ -47,12 +50,12 @@ class StatusView constructor(val tcService: TCService, val ui: UI, val executorS
 
 
     override fun enter(event: ViewChangeListener.ViewChangeEvent?) {
-        val buildConfigIds = event!!.parameters.split("/")
+        val monitorIds = event!!.parameters.split("/").map { MonitorId.fromCompleteId(it)}
 
-        val buildConfigStatus = tcService.retrieveBuildConfigurations(buildConfigIds)
-        showBuildConfigStatus(buildConfigStatus)
+        val monitorObjects = monitorService.retrieve(monitorIds)
+        showBuildConfigStatus(monitorObjects)
 
-        backgroundTask = executorService.scheduleAtFixedRate({ showBuildConfigForPush(tcService.retrieveBuildConfigurations(buildConfigIds)) }, 15, 15, TimeUnit.SECONDS)
+        backgroundTask = executorService.scheduleAtFixedRate({ showBuildConfigForPush(monitorService.retrieve(monitorIds)) }, 15, 15, TimeUnit.SECONDS)
     }
 
     @PreDestroy
@@ -60,18 +63,18 @@ class StatusView constructor(val tcService: TCService, val ui: UI, val executorS
         backgroundTask?.cancel(true)
     }
 
-    private fun showBuildConfigStatus(buildConfigStatus: List<BuildStatus>) {
+    private fun showBuildConfigStatus(monitorObjects: List<MonitorObject>) {
         statusLayout.removeAllComponents()
         var playAlert = false;
-        buildConfigStatus.forEach { buildStatus ->
-            val buildStatusUI = Label(buildStatus.buildConfiguration.name).apply {
+        monitorObjects.forEach { monitorObject ->
+            val buildStatusUI = Label(monitorObject.name).apply {
                 setWidthUndefined()
                 styleName = "buildStatus"
-                when (buildStatus.latestBuild?.status) {
-                    org.jetbrains.teamcity.rest.BuildStatus.SUCCESS -> addStyleName("success")
+                when (monitorObject.status) {
+                    Status.SUCCESS -> addStyleName("success")
                     else -> {
                         addStyleName("failure")
-                        playAlert = playAlert.xor(alertWithSoundIfNecessary(buildStatus)).or(playAlert)
+                        playAlert = playAlert.xor(alertWithSoundIfNecessary(monitorObject)).or(playAlert)
                     }
                 }
             }
@@ -86,25 +89,21 @@ class StatusView constructor(val tcService: TCService, val ui: UI, val executorS
             statusLayout.addComponent(buildStatusContainer)
         }
         previousBuildStatus.clear()
-        previousBuildStatus.addAll(buildConfigStatus)
+        previousBuildStatus.addAll(monitorObjects)
     }
 
-    private fun alertWithSoundIfNecessary(buildStatus: BuildStatus) : Boolean {
-        if (tcService.playSound().not()) {
-            return false
-        }
-
-        val prevStatus = previousBuildStatus.filter { it.buildConfiguration.name.equals(buildStatus.buildConfiguration.name) }.firstOrNull()
-        if (prevStatus == null) {
+    private fun alertWithSoundIfNecessary(monitorObject: MonitorObject) : Boolean {
+        val previousMonitorObject = previousBuildStatus.filter { it.name.equals(monitorObject.name) }.firstOrNull()
+        if (previousMonitorObject == null) {
             return true
         }
-        if (prevStatus?.latestBuild?.status != buildStatus.latestBuild?.status) {
+        if (previousMonitorObject.status != monitorObject.status) {
             return true
         }
         return false
     }
 
-    private fun showBuildConfigForPush(buildConfigStatus: List<BuildStatus>) {
+    private fun showBuildConfigForPush(buildConfigStatus: List<MonitorObject>) {
         ui.access({ showBuildConfigStatus(buildConfigStatus) })
     }
 }

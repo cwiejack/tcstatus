@@ -8,7 +8,7 @@ enum class Status {
 data class MonitorId(val systemId : String, val id: String) {
 
     internal companion object {
-        val SEPARATOR = "#"
+        val SEPARATOR = "!!"
 
         fun fromCompleteId(completeId : String) : MonitorId = MonitorId(completeId.substringBefore(SEPARATOR),completeId.substringAfter(SEPARATOR))
     }
