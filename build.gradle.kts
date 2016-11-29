@@ -60,7 +60,7 @@ dependencies {
     compile(kotlinModule("stdlib"))
     compile("com.vaadin:vaadin-spring-boot-starter:1.1.0")
     compile("org.springframework.boot:spring-boot-starter-web")
-    compile("org.springframework.boot:spring-boot:1.4.2.RELEASE")
+    compile("org.springframework.boot:spring-boot")
     compile("org.springframework.boot:spring-boot-starter-undertow")
     compile("org.springframework.boot:spring-boot-starter-log4j2")
     compile("commons-cli:commons-cli:1.3.1")
@@ -73,13 +73,13 @@ dependencies {
     testCompile("org.mockito:mockito-core:1.10.19")
     testCompile("org.assertj:assertj-core:3.5.2")
 
-    testCompile("org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}")
-    testRuntime("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
-    testCompile("junit:junit:${junit4Version}")
-    testRuntime("org.junit.vintage:junit-vintage-engine:${junitVintageVersion}")
+    testCompile("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
+    testRuntime("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
+    testCompile("junit:junit:$junit4Version")
+    testRuntime("org.junit.vintage:junit-vintage-engine:$junitVintageVersion")
 
-    testRuntime("org.apache.logging.log4j:log4j-core:${log4JVersion}")
-    testRuntime("org.apache.logging.log4j:log4j-jul:${log4JVersion}")
+    testRuntime("org.apache.logging.log4j:log4j-core:$log4JVersion")
+    testRuntime("org.apache.logging.log4j:log4j-jul:$log4JVersion")
 
     testCompile("com.nhaarman:mockito-kotlin:0.12.0")
 }
