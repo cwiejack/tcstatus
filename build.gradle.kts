@@ -1,4 +1,3 @@
-
 import com.github.opengl8080.gradle.plugin.assertj.AssertjGen
 import com.github.opengl8080.gradle.plugin.assertj.AssertjGenConfiguration
 import io.spring.gradle.dependencymanagement.DependencyManagementExtension
@@ -8,7 +7,6 @@ import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.wrapper.Wrapper
 import org.gradle.internal.impldep.org.eclipse.jdt.internal.core.Assert
 import org.gradle.script.lang.kotlin.*
-import java.util.function.Function
 
 buildscript {
     repositories {
@@ -31,6 +29,8 @@ buildscript {
         classpath("org.junit.platform:junit-platform-gradle-plugin:1.0.0-M3")
     }
 }
+
+
 
 apply {
     plugin("kotlin")
@@ -57,6 +57,9 @@ repositories {
     }
 }
 
+
+//the<AssertjGenConfiguration>().classOrPackageNames.add("de.swp.model")
+
 (tasks.getByName("compileTestJava") as JavaCompile).apply {
     options.compilerArgs + "-parameters"
 }
@@ -66,6 +69,11 @@ val mainSourceSet = sourceSets.getByName("test")!!
 val generatedJavaDir = file("$buildDir/test-generated/java")
 
 mainSourceSet.allJava.srcDirs + generatedJavaDir.absolutePath
+
+configure<AssertjGenConfiguration> {
+    classOrPackageNames.add("de.swp.model")
+    outputDir = generatedJavaDir.absolutePath
+}
 
 
 
@@ -98,7 +106,7 @@ dependencies {
 }
 
 task(name = "wrapper", type = Wrapper::class) {
-    distributionUrl = "https://repo.gradle.org/gradle/dist-snapshots/gradle-script-kotlin-3.3-20161123161139+0000-all.zip"
+    distributionUrl = "https://repo.gradle.org/gradle/dist-snapshots/gradle-script-kotlin-3.3-20161202104140+0000-all.zip"
 }
 
 configure<DependencyManagementExtension> {
