@@ -2,11 +2,16 @@ import com.github.opengl8080.gradle.plugin.assertj.AssertjGen
 import com.github.opengl8080.gradle.plugin.assertj.AssertjGenConfiguration
 import io.spring.gradle.dependencymanagement.DependencyManagementExtension
 import io.spring.gradle.dependencymanagement.ImportsHandler
+import org.gradle.api.internal.HasConvention
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.wrapper.Wrapper
 import org.gradle.internal.impldep.org.eclipse.jdt.internal.core.Assert
+import org.gradle.language.java.JavaSourceSet
 import org.gradle.script.lang.kotlin.*
+import org.jetbrains.kotlin.incremental.javaSourceRoots
+import org.jetbrains.kotlin.utils.addIfNotNull
+import java.io.File
 
 buildscript {
     repositories {
@@ -57,24 +62,22 @@ repositories {
     }
 }
 
-
-//the<AssertjGenConfiguration>().classOrPackageNames.add("de.swp.model")
-
 (tasks.getByName("compileTestJava") as JavaCompile).apply {
     options.compilerArgs + "-parameters"
 }
+val generatedJavaDir = File("$buildDir/test-generated/java")
 
-val sourceSets = the<JavaPluginConvention>().sourceSets
-val mainSourceSet = sourceSets.getByName("test")!!
-val generatedJavaDir = file("$buildDir/test-generated/java")
+configure<JavaPluginConvention> {
+    val testSourceDirs = HashSet(sourceSets.getByName("test").allJava.srcDirs).apply {
+        add(generatedJavaDir)
+    }
+    sourceSets.getByName("test").allJava.setSrcDirs(testSourceDirs)
+}
 
-mainSourceSet.allJava.srcDirs + generatedJavaDir.absolutePath
-
-configure<AssertjGenConfiguration> {
+configure <AssertjGenConfiguration> {
     classOrPackageNames.add("de.swp.model")
     outputDir = generatedJavaDir.absolutePath
 }
-
 
 
 dependencies {
