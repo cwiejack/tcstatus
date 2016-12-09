@@ -2,6 +2,7 @@ import com.github.opengl8080.gradle.plugin.assertj.AssertjGen
 import com.github.opengl8080.gradle.plugin.assertj.AssertjGenConfiguration
 import io.spring.gradle.dependencymanagement.DependencyManagementExtension
 import io.spring.gradle.dependencymanagement.ImportsHandler
+import org.gradle.api.JavaVersion
 import org.gradle.api.internal.HasConvention
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.compile.JavaCompile
@@ -63,7 +64,7 @@ repositories {
 }
 
 (tasks.getByName("compileTestJava") as JavaCompile).apply {
-    options.compilerArgs + "-parameters"
+    options.compilerArgs.add("-parameters")
 }
 val generatedJavaDir = File("$buildDir/test-generated/java")
 
@@ -72,13 +73,22 @@ configure<JavaPluginConvention> {
         add(generatedJavaDir)
     }
     sourceSets.getByName("test").allJava.setSrcDirs(testSourceDirs)
+
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-configure <AssertjGenConfiguration> {
+configure<AssertjGenConfiguration> {
     classOrPackageNames.add("de.swp.model")
     outputDir = generatedJavaDir.absolutePath
 }
 
+configurations.all {
+    dependencies {
+        it.exclude(module = "spring-boot-starter-tomcat")
+        it.exclude(module = "spring-boot-starter-logging")
+    }
+}
 
 dependencies {
     compile(kotlinModule("stdlib"))
@@ -95,7 +105,7 @@ dependencies {
 
     testCompile("org.springframework.boot:spring-boot-starter-test")
     testCompile("org.mockito:mockito-core:1.10.19")
-    testCompile("org.assertj:assertj-core:3.5.2")
+    testCompile("org.assertj:assertj-core:3.6.1")
 
     testCompile("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
     testRuntime("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
@@ -105,11 +115,11 @@ dependencies {
     testRuntime("org.apache.logging.log4j:log4j-core:$log4JVersion")
     testRuntime("org.apache.logging.log4j:log4j-jul:$log4JVersion")
 
-    testCompile("com.nhaarman:mockito-kotlin:0.12.0")
+    testCompile("com.nhaarman:mockito-kotlin:1.0.0")
 }
 
 task(name = "wrapper", type = Wrapper::class) {
-    distributionUrl = "https://repo.gradle.org/gradle/dist-snapshots/gradle-script-kotlin-3.3-20161202104140+0000-all.zip"
+    distributionUrl = "https://repo.gradle.org/gradle/dist-snapshots/gradle-script-kotlin-3.4-20161208211455+0000-bin.zip"
 }
 
 configure<DependencyManagementExtension> {
