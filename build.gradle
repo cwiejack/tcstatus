@@ -1,12 +1,12 @@
 buildscript {
     ext {
-        kotlinVersion = '1.0.5-2'
+        kotlinVersion = '1.0.5-3'
         springBootVersion = '1.4.2.RELEASE'
-        junitPlatformVersion = '1.0.0-M2'
-        junitJupiterVersion = '5.0.0-M2'
+        junitPlatformVersion = '1.0.0-M3'
+        junitJupiterVersion = '5.0.0-M3'
         log4JVersion = '2.6.2'
         junit4Version = '4.12'
-        junitVintageVersion = '4.12.0-M2'
+        junitVintageVersion = '4.12.0-M3'
     }
     repositories {
         mavenCentral()
@@ -96,21 +96,21 @@ compileTestJava {
     options.compilerArgs += '-parameters'
 }
 
-junitPlatform {
-    // platformVersion '1.0.0-SNAPSHOT'
-    engines {
-        // include 'junit-jupiter', 'junit-vintage'
-        // exclude 'custom-engine'
-    }
-    tags {
-        // include 'fast'
-        exclude 'slow'
-    }
-    // includeClassNamePattern '.*Test'
-    // enableStandardTestTask true
-    // reportsDir "build/test-results/junit-platform" // this is the default
-    logManager 'org.apache.logging.log4j.jul.LogManager'
-}
+/*junitPlatform {
+//    // platformVersion '1.0.0-SNAPSHOT'
+//    engines {
+//        // include 'junit-jupiter', 'junit-vintage'
+//        // exclude 'custom-engine'
+//    }
+//    tags {
+//        // include 'fast'
+//        exclude 'slow'
+//    }
+//    // includeClassNamePattern '.*Test'
+//    // enableStandardTestTask true
+//    // reportsDir "build/test-results/junit-platform" // this is the default
+//    logManager 'org.apache.logging.log4j.jul.LogManager'
+}*/
 
 assertjGen {
     // specify target class or package names by array. (defailt is empty array)
@@ -125,6 +125,10 @@ assertjGen {
 
 dependencyManagement {
     imports {
-        mavenBom "com.vaadin:vaadin-bom:7.7.4"
+        mavenBom "com.vaadin:vaadin-bom:7.7.6"
     }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.2.1'
 }

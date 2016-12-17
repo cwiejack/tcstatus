@@ -13,6 +13,7 @@ import org.gradle.script.lang.kotlin.*
 import org.jetbrains.kotlin.incremental.javaSourceRoots
 import org.jetbrains.kotlin.utils.addIfNotNull
 import java.io.File
+import java.util.*
 
 buildscript {
     repositories {
@@ -119,12 +120,13 @@ dependencies {
 }
 
 task(name = "wrapper", type = Wrapper::class) {
-    distributionUrl = "https://repo.gradle.org/gradle/dist-snapshots/gradle-script-kotlin-3.4-20161208211455+0000-bin.zip"
+//    distributionUrl = "https://repo.gradle.org/gradle/dist-snapshots/gradle-script-kotlin-3.4-20161208211455+0000-bin.zip"
+    version = "3.2.1"
 }
 
 configure<DependencyManagementExtension> {
     imports(delegateClosureOf<ImportsHandler> {
-        mavenBom("com.vaadin:vaadin-bom:7.7.4")
+        mavenBom("com.vaadin:vaadin-bom:7.7.6")
     })
 }
 
