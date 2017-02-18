@@ -1,7 +1,7 @@
 buildscript {
     ext {
-        kotlinVersion = '1.0.5-3'
-        springBootVersion = '1.4.2.RELEASE'
+        kotlinVersion = '1.1.0-rc-91'
+        springBootVersion = '1.5.1.RELEASE'
         junitPlatformVersion = '1.0.0-M3'
         junitJupiterVersion = '5.0.0-M3'
         log4JVersion = '2.6.2'
@@ -16,18 +16,24 @@ buildscript {
         maven {
             url 'https://repo.spring.io/libs-snapshot'
         }
+        maven {
+            url "http://dl.bintray.com/kotlin/kotlin-eap-1.1"
+        }
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
+        classpath("org.jetbrains.kotlin:kotlin-noarg:$kotlinVersion")
+        classpath("org.jetbrains.kotlin:kotlin-allopen:$kotlinVersion")
         classpath "gradle.plugin.com.github.opengl-8080:assertjGen-gradle-plugin:1.1.0"
-        classpath "org.junit.platform:junit-platform-gradle-plugin:${junitPlatformVersion}"
+        classpath "org.junit.platform:junit-platform-gradle-plugin:$junitPlatformVersion"
         classpath "com.netflix.nebula:gradle-extra-configurations-plugin:3.1.0"
     }
 }
 
 apply plugin: 'java'
 apply plugin: 'kotlin'
+apply plugin: 'kotlin-spring'
 apply plugin: 'eclipse'
 apply plugin: "com.github.opengl-BOBO.assertjGen"
 apply plugin: 'org.springframework.boot'
@@ -49,6 +55,9 @@ repositories {
     maven {
         url 'https://repo.spring.io/libs-snapshot'
     }
+    maven {
+        url "http://dl.bintray.com/kotlin/kotlin-eap-1.1"
+    }
 }
 
 configurations {
@@ -57,12 +66,12 @@ configurations {
 }
 
 dependencies {
-    compile('com.vaadin:vaadin-spring-boot-starter:1.1.0')
+    compile('com.vaadin:vaadin-spring-boot-starter:1.2.0')
     compile('org.springframework.boot:spring-boot-starter-web')
     compile('org.springframework.boot:spring-boot')
     compile("org.springframework.boot:spring-boot-starter-undertow")
     compile("org.springframework.boot:spring-boot-starter-log4j2")
-    compile("org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion}")
+    compile("org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlinVersion")
     compile('commons-cli:commons-cli:1.3.1')
     compile("com.vaadin:vaadin-themes")
     compile("com.vaadin:vaadin-push")
@@ -71,15 +80,15 @@ dependencies {
 
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile('org.mockito:mockito-core:1.10.19')
-    testCompile 'org.assertj:assertj-core:3.5.2'
+    testCompile 'org.assertj:assertj-core:3.6.2'
 
     testCompile("org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}")
     testRuntime("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
     testCompile("junit:junit:${junit4Version}")
     testRuntime("org.junit.vintage:junit-vintage-engine:${junitVintageVersion}")
 
-    testRuntime("org.apache.logging.log4j:log4j-core:${log4JVersion}")
-    testRuntime("org.apache.logging.log4j:log4j-jul:${log4JVersion}")
+    testRuntime("org.apache.logging.log4j:log4j-core")
+    testRuntime("org.apache.logging.log4j:log4j-jul")
 
     testCompile "com.nhaarman:mockito-kotlin:0.12.0"
 }
@@ -90,6 +99,10 @@ sourceSets {
             srcDirs "${buildDir}/test-generated/java"
         }
     }
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
 }
 
 compileTestJava {

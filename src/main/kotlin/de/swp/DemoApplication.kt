@@ -18,7 +18,7 @@ import javax.annotation.PostConstruct
 import javax.servlet.ServletContext
 
 @SpringBootApplication
-open class DemoApplication {
+class DemoApplication {
 
     lateinit var servletContext: ServletContext @Autowired set
 
@@ -33,10 +33,10 @@ open class DemoApplication {
     }
 
     @Bean(destroyMethod = "shutdownNow")
-    open fun executorService() : ScheduledExecutorService = ScheduledThreadPoolExecutor(5)
+    fun executorService() : ScheduledExecutorService = ScheduledThreadPoolExecutor(5)
 
     @Bean
-    open fun commandLineRunner(tcServerData: TCServerData): CommandLineRunner {
+    fun commandLineRunner(tcServerData: TCServerData): CommandLineRunner {
         return object : CommandLineRunner {
             override fun run(args: Array<String>) {
                 val options = getOptionParams()

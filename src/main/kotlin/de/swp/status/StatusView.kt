@@ -45,7 +45,6 @@ class StatusView constructor(val monitorService: MonitorService, val ui: UI, val
 
         content = VerticalLayout(statusLayout,alert)
         setSizeFull()
-
     }
 
 
@@ -93,7 +92,7 @@ class StatusView constructor(val monitorService: MonitorService, val ui: UI, val
     }
 
     private fun alertWithSoundIfNecessary(monitorObject: MonitorObject) : Boolean {
-        val previousMonitorObject = previousBuildStatus.filter { it.name.equals(monitorObject.name) }.firstOrNull()
+        val previousMonitorObject = previousBuildStatus.filter { it.name == monitorObject.name }.firstOrNull()
         if (previousMonitorObject == null) {
             return true
         }
